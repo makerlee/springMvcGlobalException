@@ -1,0 +1,2 @@
+# springMvcGlobalException
+springMVC restful接口全局异常处理，枚举类应用
