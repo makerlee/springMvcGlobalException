@@ -1,12 +1,16 @@
 package com.example.demo.controller;
 
 import com.example.demo.service.IUserService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Created by lijiyang on 2017/5/25.
@@ -14,23 +18,45 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/", produces = "application/json; charset=utf-8")
 public class Controller {
+    public static final Logger logger = Logger.getLogger(Controller.class);
+
     @Value("${words}")
     String words;
 
     @Autowired
     private IUserService userService;
 
-    @RequestMapping(value = "/test",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/test",method = RequestMethod.POST)
     public String test(@RequestParam("name") String name,
-                       @RequestBody Key[] keys){
-        System.out.println("------------->name="+name);
+                       @RequestBody Key key){
+        logger.error("this just a test error info");
+        logger.info("this just a test info for elk");
 
-        for (Key key : keys){
-            System.out.println("id="+key.getId()+",value="+key.getValue());
-            int useFlag=key.getId();
-            System.out.println(useFlag==0?1:0);
-        }
+        KeyChild keyChild = (KeyChild)key;
+
+        System.out.println(keyChild);
+
+        logger.error(key);
         return name;
+    }
+
+    public static void main(String[] args) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://".concat("localhost:8012").concat("/test").concat("?name={name}");
+        KeyChild key = new KeyChild();
+        key.setId(1);
+        key.setValue("123");
+        key.setExt("123");
+
+        LinkedMultiValueMap uriParams = new LinkedMultiValueMap();
+        uriParams.add("name", "123");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity req = new HttpEntity<>(key, headers);
+        ResponseEntity<String> result = restTemplate.postForEntity(url, req, String.class,uriParams);
+        System.out.println(result.getBody().toString());
+        System.out.println("============================");
     }
 
     @RequestMapping("/")
@@ -54,5 +80,10 @@ public class Controller {
             result = "FAILED";
         }
         return result;
+    }
+
+    @RequestMapping(value = "/add",method = RequestMethod.POST)
+    public void add(@RequestParam("name") String name){
+        System.out.println("---------->"+name);
     }
 }

@@ -1,6 +1,5 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.exception.IError;
 import com.example.demo.exception.RedisExceptionEnum;
 import com.example.demo.exception.ServiceException;
 import com.example.demo.service.IUserService;
@@ -19,6 +18,14 @@ import java.util.Map;
 public class UserServiceImpl implements IUserService{
     @Autowired
     private RedisTemplate<String,String> template;
+
+    @Autowired
+    private TestAAA aaa;
+
+
+    public TestAAA getAaa(){
+        return aaa;
+    }
 
     @Override
     public void addUser(int id) {

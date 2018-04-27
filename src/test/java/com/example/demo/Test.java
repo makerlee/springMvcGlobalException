@@ -1,28 +1,27 @@
 package com.example.demo;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 
-/**
- * Created by lijiyang on 2017/6/5.
- */
-public class Test {
-    @org.junit.Test
-    public void test(){
-        SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date now = new Date();
+public class Test{
+    static int i = 0;
+    public static void main(String[] args) {
 
-        long nowLong = now.getTime();
-        System.out.println(nowLong);
-        String nowStr = sm.format(now);
-        System.out.println(nowStr);
-        System.out.println(new Date(1500368661043L));
-    }
+        CountDownLatch latch = new CountDownLatch(10000);
+        for (int j=0;j<10000;j++){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    i++;
+                    latch.countDown();
+                }
+            }).start();
+        }
 
-    @org.junit.Test
-    public void optional(){
-        Optional<?> optional=Optional.ofNullable("123");
-        System.out.println(optional.isPresent());
+        try {
+            latch.await();
+            System.out.println(i);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
