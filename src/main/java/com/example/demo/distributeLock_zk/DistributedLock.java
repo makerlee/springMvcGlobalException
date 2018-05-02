@@ -54,7 +54,6 @@ public class DistributedLock implements Lock, Watcher {
      */
     public void process(WatchedEvent event) {
         if(this.latch != null) {
-            System.out.println(event.getType().name());
             this.latch.countDown();
         }
     }
@@ -126,7 +125,12 @@ public class DistributedLock implements Lock, Watcher {
     }
 
     private boolean waitForLock(String lower, long waitTime) throws InterruptedException, KeeperException {
-        Stat stat = zk.exists(root + "/" + lower,true);
+        /**If the watch is true and the call is successful (no exception is thrown),
+         * a watch will be left on the node with the given path. The watch will be triggered
+         * by a successful operation that creates/delete the node or sets the data on the node.
+         * 由于没理解这个方法的实际作用，被坑了好几个小时
+        */
+         Stat stat = zk.exists(root + "/" + lower,true);
         //判断比自己小一个数的节点是否存在,如果不存在则无需等待锁,同时注册监听
         if(stat != null){
             System.out.println("Thread " + Thread.currentThread().getId() + " waiting for " + root + "/" + lower);

@@ -1,8 +1,6 @@
 package com.example.demo.distributeLock_zk;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * zookeeper分布式锁实现测试
@@ -39,15 +37,6 @@ public class TestLock {
         lock.unlock();
     }
 
-    //模拟多线程竞争锁
-    public static void testMultiThead(){
-        ExecutorService fixedThreadPool = Executors.newFixedThreadPool(20);
-        for (int i=0;i<20;i++){
-            DistributedLock lock = new DistributedLock("172.20.66.159:2181","test-multi");
-            fixedThreadPool.submit(new Task(lock));
-        }
-        fixedThreadPool.shutdown();
-    }
 
     public static void testBasic(){
         DistributedLock lock = new DistributedLock("172.20.66.159:2181","test");
@@ -55,27 +44,6 @@ public class TestLock {
         try {
             // do something business
             Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }finally {
-            lock.unlock();
-        }
-    }
-}
-
-class Task extends Thread{
-    private DistributedLock lock;
-
-    public Task(DistributedLock lock) {
-        this.lock = lock;
-    }
-
-    @Override
-    public void run() {
-        try {
-            lock.lock();
-            Thread.sleep(1000);
-            System.out.println(this.getName()+"正在执行.....");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }finally {
